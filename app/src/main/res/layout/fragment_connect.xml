@@ -1,0 +1,38 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    tools:context="me.eagzzycsl.intertent.frag.ConnectFragment">
+    <TextView
+        android:layout_width="wrap_content"
+        android:text="在pc端internet中输入以下ip地址以连接"
+        android:layout_height="wrap_content" />
+    <android.support.v7.widget.CardView
+        android:layout_margin="16dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_margin="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_ip"
+            android:textColor="@color/colorPrimary"
+            android:text="@string/hello_blank_fragment" />
+    </android.support.v7.widget.CardView>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:text="或扫描二维码"
+        android:layout_height="wrap_content" />
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_scan_qr"
+        android:layout_margin="32dp"
+        android:layout_width="wrap_content"
+        android:src="@drawable/ic_camera_white"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

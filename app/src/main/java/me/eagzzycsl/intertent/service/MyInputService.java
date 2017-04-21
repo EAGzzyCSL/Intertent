@@ -123,7 +123,6 @@ public class MyInputService extends InputMethodService {
     @Override
     public void onDestroy() {
         MyLog.i(MyLog.msg_inputService, "销毁");
-//        myWebSocketServer.close();
 
         super.onDestroy();
         EventBus.getDefault().unregister(this);
@@ -140,6 +139,9 @@ public class MyInputService extends InputMethodService {
                     break;
                 }
                 case InputEvent.type_enter:{
+                    inputConnection.performEditorAction(
+                            EditorInfo.IME_ACTION_SEND
+                    );
                     MyLog.i("input","enterevent");
                     break;
                 }
@@ -148,7 +150,6 @@ public class MyInputService extends InputMethodService {
                     break;
                 }
                 case InputEvent.type_cursorLeft:{
-
                     break;
                 }
                 case InputEvent.type_cursorRight:{

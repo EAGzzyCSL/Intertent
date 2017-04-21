@@ -1,5 +1,7 @@
 package me.eagzzycsl.intertent.manager;
 
+import android.content.Intent;
+
 import com.koushikdutta.async.ByteBufferList;
 import com.koushikdutta.async.DataEmitter;
 import com.koushikdutta.async.callback.CompletedCallback;
@@ -10,6 +12,7 @@ import com.koushikdutta.async.http.server.AsyncHttpServerRequest;
 
 import org.greenrobot.eventbus.EventBus;
 
+import me.eagzzycsl.intertent.event.CallEvent;
 import me.eagzzycsl.intertent.event.EventList;
 import me.eagzzycsl.intertent.event.InputEvent;
 import me.eagzzycsl.intertent.utils.MyLog;
@@ -53,14 +56,23 @@ public class ServerManager {
                     public void onStringAvailable(String s) {
                         MyLog.i("serverManager",s);
                         String[] ss=s.split("\\|",2);
-                        if(ss[0].equals(EventList.input.name)){
-                            InputEvent inputEvent=(InputEvent)SingleManager
-                                    .getGson().fromJson(ss[1],EventList.input.cls);
-                            MyLog.i("servermanager",EventList.input.name);
-                            EventBus.getDefault().post(inputEvent);
-                        }else {
-
+                        String json=ss[1];
+                        switch (ss[0]){
+                            case EventList.event_input:{
+                                InputEvent inputEvent=(InputEvent)SingleManager
+                                        .getGson().fromJson(json,EventList.input.cls);
+                                MyLog.i("servermanager",EventList.input.name);
+                                EventBus.getDefault().post(inputEvent);
+                                break;
+                            }
+                            case EventList.event_call:{
+                                CallEvent callEvent=(CallEvent)SingleManager
+                                        .getGson().fromJson(json,EventList.call.cls);
+                                EventBus.getDefault().post(callEvent);
+                                break;
+                            }
                         }
+
                         MyLog.i("ws receive",s);
                     }
                 });

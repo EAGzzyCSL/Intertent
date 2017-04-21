@@ -1,5 +1,6 @@
 package me.eagzzycsl.intertent.service;
 
+import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -7,8 +8,12 @@ import android.app.Service;
 import android.app.usage.UsageEvents;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.telecom.Call;
 
 import com.google.gson.Gson;
 import com.koushikdutta.async.callback.CompletedCallback;
@@ -21,6 +26,7 @@ import org.greenrobot.eventbus.Subscribe;
 
 import me.eagzzycsl.intertent.MainActivity;
 import me.eagzzycsl.intertent.R;
+import me.eagzzycsl.intertent.event.CallEvent;
 import me.eagzzycsl.intertent.event.InputEvent;
 import me.eagzzycsl.intertent.event.MyEvent;
 import me.eagzzycsl.intertent.manager.ServerManager;
@@ -36,7 +42,8 @@ public class MainService extends Service {
     public IBinder onBind(Intent intent) {
         return null;
     }
-    private void iniNotification(){
+
+    private void iniNotification() {
 
         Notification.Builder builder = new Notification.Builder(this);
 //        builder.setContentInfo("补充内容");
@@ -51,13 +58,15 @@ public class MainService extends Service {
                 this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
         builder.setContentIntent(pendingIntent);
         Notification notification = builder.build();
-        ((NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE)).notify(0,notification);
+        ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).notify(0, notification);
         startForeground(1, notification);
-        MyLog.i("服务" , "onCreate() executed");
+        MyLog.i("服务", "onCreate() executed");
     }
-    private void initServer(){
+
+    private void initServer() {
         ServerManager.initWebSocket();
     }
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -71,8 +80,17 @@ public class MainService extends Service {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
     }
-    @Subscribe
-    public void onPostEvent(MyEvent myEvent){
 
+    @Subscribe
+    public void onEvent(CallEvent callEvent) {
+        MyLog.i("打电话:",callEvent.getPhone_number());
+        Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + callEvent.getPhone_number()));
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        startActivity(intent);
     }
+
 }
