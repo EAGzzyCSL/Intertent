@@ -5,7 +5,9 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.app.usage.UsageEvents;
+import android.content.ClipData;
+import android.content.ClipDescription;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -13,22 +15,15 @@ import android.net.Uri;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
-import android.telecom.Call;
-
-import com.google.gson.Gson;
-import com.koushikdutta.async.callback.CompletedCallback;
-import com.koushikdutta.async.http.WebSocket;
-import com.koushikdutta.async.http.server.AsyncHttpServer;
-import com.koushikdutta.async.http.server.AsyncHttpServerRequest;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import me.eagzzycsl.intertent.MainActivity;
 import me.eagzzycsl.intertent.R;
 import me.eagzzycsl.intertent.event.CallEvent;
-import me.eagzzycsl.intertent.event.InputEvent;
-import me.eagzzycsl.intertent.event.MyEvent;
+import me.eagzzycsl.intertent.event.ClipboardEvent;
 import me.eagzzycsl.intertent.manager.ServerManager;
 import me.eagzzycsl.intertent.utils.MyLog;
 
@@ -64,7 +59,7 @@ public class MainService extends Service {
     }
 
     private void initServer() {
-        ServerManager.initWebSocket();
+        ServerManager.getInstance().initWebSocket();
     }
 
     @Override
@@ -91,6 +86,35 @@ public class MainService extends Service {
             return;
         }
         startActivity(intent);
+    }
+    private void dealClipboardEvent(ClipboardEvent clipboardEvent){
+        ClipboardManager clipboardManager = (ClipboardManager)getSystemService(CLIPBOARD_SERVICE);
+
+        switch (clipboardEvent.getAction()){
+            case ClipboardEvent.action_get:{
+                if(clipboardManager.getPrimaryClipDescription().hasMimeType(
+                        ClipDescription.MIMETYPE_TEXT_PLAIN
+                )){
+                    ClipData clipData=clipboardManager.getPrimaryClip();
+                    ClipData.Item item=clipData.getItemAt(0);
+                    ServerManager.getInstance().sendClipboardEvent(
+                            new ClipboardEvent(ClipboardEvent.action_get,
+                                    item.getText().toString())
+                    );
+                }
+                break;
+            }
+            case ClipboardEvent.action_set:{
+                ClipData text = ClipData.newPlainText("label",clipboardEvent.getValue());
+                clipboardManager.setPrimaryClip(text);
+                break;
+            }
+        }
+    }
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(ClipboardEvent clipboardEvent){
+        MyLog.i("粘贴版", clipboardEvent.getAction());
+        dealClipboardEvent(clipboardEvent);
     }
 
 }

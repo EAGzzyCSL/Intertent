@@ -30,7 +30,6 @@ import me.eagzzycsl.intertent.utils.MyLog;
 
 public class MyInputService extends InputMethodService {
     private TextView textView_info;
-    //    private MyWebSocketServer myWebSocketServer;
     private String wsLink = null;
     private String state = null;
     private boolean currentShowIsWsLink = true;
