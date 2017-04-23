@@ -9,6 +9,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -54,8 +55,8 @@ public class MainActivity extends AppCompatActivity
         this.myCreate();
         this.mySet();
         startService(new Intent(this, MainService.class));
-
-
+        Log.i("window",getWindow().getDecorView().getRootView().toString());
+        Log.i("window",getWindow().getDecorView().getRootView().getRootView().toString());
     }
 
     @Override

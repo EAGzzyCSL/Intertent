@@ -1,8 +1,6 @@
 package me.eagzzycsl.intertent.frag;
 
 import android.content.Context;
-import android.net.Uri;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -10,19 +8,14 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
-import java.math.BigInteger;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.nio.ByteOrder;
-import java.util.Enumeration;
+import org.greenrobot.eventbus.EventBus;
 
 import me.eagzzycsl.intertent.R;
+import me.eagzzycsl.intertent.manager.ServerManager;
 import me.eagzzycsl.intertent.utils.NetWorkUtils;
 
 public class ConnectFragment extends Fragment implements View.OnClickListener {
@@ -78,14 +71,15 @@ public class ConnectFragment extends Fragment implements View.OnClickListener {
         super.onDetach();
     }
     private void myFindView(View mView){
-        fab_scan_qr = (FloatingActionButton) mView.findViewById(R.id.fab_scan_qr);
+        fab_scan_qr = (FloatingActionButton) mView.findViewById(R.id.fab_opt);
         textView_ip =(TextView)mView.findViewById(R.id.textView_ip);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()){
-            case R.id.fab_scan_qr:{
+            case R.id.fab_opt:{
+                ServerManager.getInstance().disConnectWebSocket();
                 break;
             }
         }

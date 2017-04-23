@@ -11,10 +11,18 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.PixelFormat;
 import android.net.Uri;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.LinearLayout;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -37,7 +45,6 @@ public class MainService extends Service {
     public IBinder onBind(Intent intent) {
         return null;
     }
-
     private void iniNotification() {
 
         Notification.Builder builder = new Notification.Builder(this);
@@ -66,7 +73,7 @@ public class MainService extends Service {
     public void onCreate() {
         super.onCreate();
         EventBus.getDefault().register(this);
-        iniNotification();
+//        iniNotification();
         initServer();
     }
 
@@ -78,7 +85,6 @@ public class MainService extends Service {
 
     @Subscribe
     public void onEvent(CallEvent callEvent) {
-        MyLog.i("打电话:",callEvent.getPhone_number());
         Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + callEvent.getPhone_number()));
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         if (ActivityCompat.checkSelfPermission(this,
@@ -113,8 +119,8 @@ public class MainService extends Service {
     }
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(ClipboardEvent clipboardEvent){
-        MyLog.i("粘贴版", clipboardEvent.getAction());
         dealClipboardEvent(clipboardEvent);
     }
+
 
 }

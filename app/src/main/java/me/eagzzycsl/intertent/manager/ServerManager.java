@@ -1,7 +1,5 @@
 package me.eagzzycsl.intertent.manager;
 
-import android.app.usage.UsageEvents;
-import android.content.ClipData;
 
 import com.koushikdutta.async.callback.CompletedCallback;
 import com.koushikdutta.async.http.WebSocket;
@@ -15,7 +13,7 @@ import me.eagzzycsl.intertent.event.ClipboardEvent;
 import me.eagzzycsl.intertent.event.EventList;
 import me.eagzzycsl.intertent.event.EventPackForJs;
 import me.eagzzycsl.intertent.event.InputEvent;
-import me.eagzzycsl.intertent.event.MyEvent;
+import me.eagzzycsl.intertent.event.MouseEvent;
 import me.eagzzycsl.intertent.utils.MyLog;
 import me.eagzzycsl.intertent.utils.SingleManager;
 
@@ -29,6 +27,40 @@ public class ServerManager {
     private static boolean listened = false;
     private WebSocket webSocket;
     private AsyncHttpServer serverInstance = new AsyncHttpServer();
+    private WebSocket.StringCallback webSocketStringCallback= new WebSocket.StringCallback() {
+        @Override
+        public void onStringAvailable(String s) {
+//            MyLog.i("serverManager", s);
+            String[] ss = s.split("\\|", 2);
+            String json = ss[1];
+            switch (ss[0]) {
+                case EventList.event_input: {
+                    InputEvent inputEvent = (InputEvent) SingleManager
+                            .getGson().fromJson(json, EventList.input.cls);
+                    EventBus.getDefault().post(inputEvent);
+                    break;
+                }
+                case EventList.event_call: {
+                    CallEvent callEvent = (CallEvent) SingleManager
+                            .getGson().fromJson(json, EventList.call.cls);
+                    EventBus.getDefault().post(callEvent);
+                    break;
+                }
+                case EventList.event_clipboard: {
+                    ClipboardEvent clipBoardEvent = (ClipboardEvent) SingleManager
+                            .getGson().fromJson(json, EventList.clipboard.cls);
+                    EventBus.getDefault().post(clipBoardEvent);
+                    break;
+                }
+                case EventList.event_mouse:{
+                    MouseEvent mouseEvent=(MouseEvent)SingleManager
+                            .getGson().fromJson(json,EventList.mouse.cls);
+                    EventBus.getDefault().post(mouseEvent);
+                    break;
+                }
+            }
+        }
+    };
 
     private ServerManager() {
     }
@@ -63,41 +95,16 @@ public class ServerManager {
                             }
                         });
 
-                        webSocket.setStringCallback(new WebSocket.StringCallback() {
-                            @Override
-                            public void onStringAvailable(String s) {
-                                MyLog.i("serverManager", s);
-                                String[] ss = s.split("\\|", 2);
-                                String json = ss[1];
-                                switch (ss[0]) {
-                                    case EventList.event_input: {
-                                        InputEvent inputEvent = (InputEvent) SingleManager
-                                                .getGson().fromJson(json, EventList.input.cls);
-                                        MyLog.i("servermanager", EventList.input.name);
-                                        EventBus.getDefault().post(inputEvent);
-                                        break;
-                                    }
-                                    case EventList.event_call: {
-                                        CallEvent callEvent = (CallEvent) SingleManager
-                                                .getGson().fromJson(json, EventList.call.cls);
-                                        EventBus.getDefault().post(callEvent);
-                                        break;
-                                    }
-                                    case EventList.event_clipboard: {
-                                        ClipboardEvent clipBoardEvent = (ClipboardEvent) SingleManager
-                                                .getGson().fromJson(json, EventList.clipboard.cls);
-                                        EventBus.getDefault().post(clipBoardEvent);
-                                        break;
-                                    }
-                                }
-
-                                MyLog.i("ws receive", s);
-                            }
-                        });
+                        webSocket.setStringCallback(webSocketStringCallback);
 
                     }
 
                 });
+    }
+    public void disConnectWebSocket(){
+        if(this.webSocket!=null){
+            webSocket.close();
+        }
     }
     public void sendClipboardEvent(ClipboardEvent clipboardEvent) {
         this.webSocket.send(
