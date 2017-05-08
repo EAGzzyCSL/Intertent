@@ -20,5 +20,18 @@ public enum MsgType {
     public int getInt() {
         return this.typeInt;
     }
-
+    public static MsgType fromInt(int typeInt){
+        switch (typeInt){
+            case type_text:{
+                return text;
+            }
+            case type_img:{
+                return img;
+            }
+            case type_file:{
+                return file;
+            }
+        }
+        return null;
+    }
 }

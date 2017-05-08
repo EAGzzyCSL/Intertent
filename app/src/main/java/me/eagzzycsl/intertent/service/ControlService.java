@@ -1,7 +1,11 @@
 package me.eagzzycsl.intertent.service;
 
 import android.accessibilityservice.AccessibilityService;
+import android.app.Activity;
+import android.app.ActivityManager;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.os.Bundle;
@@ -116,6 +120,7 @@ public class ControlService extends   AccessibilityService {
                 return nearestSmaller;
             }
         }
+        ActivityManager.RunningAppProcessInfo a=null;
         return sourceNode;
     }
 }

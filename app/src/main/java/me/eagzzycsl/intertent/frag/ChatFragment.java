@@ -22,6 +22,7 @@ import me.eagzzycsl.intertent.adapter.ChatRecAdapter;
 import me.eagzzycsl.intertent.model.ChatMsg;
 import me.eagzzycsl.intertent.model.MsgType;
 import me.eagzzycsl.intertent.model.SourceType;
+import me.eagzzycsl.intertent.utils.SQLMan;
 
 /**
  * Created by eagzzycsl on 4/17/17.
@@ -55,22 +56,24 @@ public class ChatFragment extends Fragment {
     }
     private void myCreate(){
         chatRecAdapter =new ChatRecAdapter();
-        chatRecAdapter.setData(new ArrayList<>(
-                Arrays.asList(new ChatMsg[]{
-                        new ChatMsg(0,
-                                new GregorianCalendar(2017,4,21,15,20,30),
-                                MsgType.text,
-                                "hello world",
-                                SourceType.android
-                                ),
-                        new ChatMsg(0,
-                                new GregorianCalendar(2017,4,21,15,20,30),
-                                MsgType.text,
-                                "hi hi hi ",
-                                SourceType.pc
-                        )
-                })
-        ));
+        SQLMan.getInstance(getActivity().getApplicationContext()).addChatHis(
+                new ChatMsg(
+                        (new GregorianCalendar(2017,4,21,15,40,30)).getTimeInMillis(),
+                        MsgType.text,
+                        "hi hi hi ",
+                        SourceType.pc
+                )
+        );
+        SQLMan.getInstance(getActivity().getApplicationContext()).addChatHis(
+                new ChatMsg(
+                        (new GregorianCalendar(2017,4,21,15,20,30)).getTimeInMillis(),
+                        MsgType.text,
+                        "hello world",
+                        SourceType.android
+                )
+        );
+        chatRecAdapter.setData(SQLMan.getInstance(getActivity().getApplicationContext()).getAllChatHis());
+
 
     }
     private void mySet(){
