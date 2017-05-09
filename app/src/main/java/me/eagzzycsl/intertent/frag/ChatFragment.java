@@ -16,6 +16,9 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -23,6 +26,7 @@ import java.util.GregorianCalendar;
 
 import me.eagzzycsl.intertent.R;
 import me.eagzzycsl.intertent.adapter.ChatRecAdapter;
+import me.eagzzycsl.intertent.event.MsgEvent;
 import me.eagzzycsl.intertent.model.ChatMsg;
 import me.eagzzycsl.intertent.model.MsgType;
 import me.eagzzycsl.intertent.model.SourceType;
@@ -40,7 +44,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
     private ImageButton chat_input_image;
     private ImageButton chat_input_send;
     private EditText chat_input_edit;
-
+    private ArrayList<ChatMsg> chatMsgList;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,23 +74,25 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
     }
     private void myCreate(){
         chatRecAdapter =new ChatRecAdapter();
-        SQLMan.getInstance(getActivity().getApplicationContext()).addChatHis(
-                new ChatMsg(
-                        (new GregorianCalendar(2017,4,21,15,40,30)).getTimeInMillis(),
-                        MsgType.text,
-                        "hi hi hi ",
-                        SourceType.pc
-                )
-        );
-        SQLMan.getInstance(getActivity().getApplicationContext()).addChatHis(
-                new ChatMsg(
-                        (new GregorianCalendar(2017,4,21,15,20,30)).getTimeInMillis(),
-                        MsgType.text,
-                        "hello world",
-                        SourceType.android
-                )
-        );
-        chatRecAdapter.setData(SQLMan.getInstance(getActivity().getApplicationContext()).getAllChatHis());
+//        SQLMan.getInstance(getActivity().getApplicationContext()).addChatHis(
+//                new ChatMsg(
+//                        (new GregorianCalendar(2017,4,21,15,40,30)).getTimeInMillis(),
+//                        MsgType.text,
+//                        "hi hi hi ",
+//                        SourceType.pc
+//                )
+//        );
+//        SQLMan.getInstance(getActivity().getApplicationContext()).addChatHis(
+//                new ChatMsg(
+//                        (new GregorianCalendar(2017,4,21,15,20,30)).getTimeInMillis(),
+//                        MsgType.text,
+//                        "hello world",
+//                        SourceType.android
+//                )
+//        );
+        chatMsgList=SQLMan.getInstance(getActivity().getApplicationContext()).getAllChatHis();
+        chatRecAdapter.setData(chatMsgList);
+        rec_chat_list.scrollToPosition(chatMsgList.size());
 
 
     }
@@ -115,17 +121,42 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
 
             }
         });
+        chat_input_edit.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+            }
+        });
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()){
+            case R.id.chat_input_send:{
+                ChatMsg chatMsg =new ChatMsg(
+                        System.currentTimeMillis(),
+                        MsgType.text,
+                        chat_input_edit.getText().toString(),
+                        SourceType.android
+                );
+                this.addMsgToDbAndUI(chatMsg);
+                chat_input_edit.setText("");
 
+            }
         }
     }
     private void toggleSendState(boolean send){
         chat_input_image.setVisibility(send?View.GONE:View.VISIBLE);
         chat_input_file.setVisibility(send?View.GONE:View.VISIBLE);
         chat_input_send.setVisibility(send?View.VISIBLE:View.GONE);
+    }
+    private void addMsgToDbAndUI(ChatMsg chatMsg){
+        chatMsg.setId(SQLMan.getInstance(getContext().getApplicationContext()).addChatHis(chatMsg));
+        chatMsgList.add(chatMsg);
+        chatRecAdapter.notifyItemInserted(chatMsgList.size());
+        rec_chat_list.smoothScrollToPosition(chatMsgList.size());
+    }
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(MsgEvent msgEvent){
+        this.addMsgToDbAndUI(msgEvent.toChatMsg());
     }
 }

@@ -32,6 +32,7 @@ import me.eagzzycsl.intertent.MainActivity;
 import me.eagzzycsl.intertent.R;
 import me.eagzzycsl.intertent.event.CallEvent;
 import me.eagzzycsl.intertent.event.ClipboardEvent;
+import me.eagzzycsl.intertent.event.MsgEvent;
 import me.eagzzycsl.intertent.manager.ServerManager;
 import me.eagzzycsl.intertent.utils.MyLog;
 

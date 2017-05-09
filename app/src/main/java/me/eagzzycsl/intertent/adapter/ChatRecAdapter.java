@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import me.eagzzycsl.intertent.R;
 import me.eagzzycsl.intertent.model.ChatMsg;
 import me.eagzzycsl.intertent.model.MsgType;
+import me.eagzzycsl.intertent.model.SourceType;
 
 
 public class ChatRecAdapter extends Adapter<ChatRecAdapter.ChatRecViewHolder> {
@@ -33,7 +34,10 @@ public class ChatRecAdapter extends Adapter<ChatRecAdapter.ChatRecViewHolder> {
 
         @CallSuper
         public void updateUI(ChatMsg chatMsg) {
-            ((LinearLayout) itemView).setGravity(Gravity.END);
+
+            ((LinearLayout) itemView).setGravity(
+                    chatMsg.getSourceType()== SourceType.android?Gravity.END:Gravity.START
+            );
         }
     }
 
@@ -52,6 +56,7 @@ public class ChatRecAdapter extends Adapter<ChatRecAdapter.ChatRecViewHolder> {
         @Override
         public void updateUI(ChatMsg chatMsg) {
             super.updateUI(chatMsg);
+            textView_msgText.setText(chatMsg.getValue());
         }
     }
 

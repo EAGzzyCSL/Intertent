@@ -14,6 +14,7 @@ import me.eagzzycsl.intertent.event.EventList;
 import me.eagzzycsl.intertent.event.EventPackForJs;
 import me.eagzzycsl.intertent.event.InputEvent;
 import me.eagzzycsl.intertent.event.MouseEvent;
+import me.eagzzycsl.intertent.event.MsgEvent;
 import me.eagzzycsl.intertent.utils.MyLog;
 import me.eagzzycsl.intertent.utils.SingleManager;
 
@@ -56,6 +57,12 @@ public class ServerManager {
                     MouseEvent mouseEvent=(MouseEvent)SingleManager
                             .getGson().fromJson(json,EventList.mouse.cls);
                     EventBus.getDefault().post(mouseEvent);
+                    break;
+                }
+                case EventList.event_msg:{
+                    MsgEvent msgEvent=(MsgEvent)SingleManager.getGson()
+                            .fromJson(json,EventList.msg.cls);
+                    EventBus.getDefault().post(msgEvent);
                     break;
                 }
             }

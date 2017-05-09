@@ -14,7 +14,7 @@ import me.eagzzycsl.intertent.utils.TableField;
  */
 
 public class ChatMsg {
-    private long _id;
+    private long id;
     // 或许直接存时间戳
     private long time;
     private MsgType type;
@@ -26,13 +26,22 @@ public class ChatMsg {
         this.value=value;
         this.sourceType=sourceType;
     }
-    private ChatMsg(long _id,long time,MsgType type,String value,SourceType sourceType){
+    private ChatMsg(long id,long time,MsgType type,String value,SourceType sourceType){
         this(time,type,value,sourceType);
-        this._id =_id;
+        this.id =id;
 
+    }
+    public void setId(long id){
+        this.id=id;
+    }
+    public SourceType getSourceType(){
+        return this.sourceType;
     }
     public int getTypeInt(){
         return this.type.getInt();
+    }
+    public String getValue(){
+        return this.value;
     }
     public ContentValues toContentValues(){
         ContentValues cv=new ContentValues();
