@@ -7,6 +7,7 @@ import android.support.design.widget.TabLayout;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import me.eagzzycsl.intertent.event.MsgEvent;
 import me.eagzzycsl.intertent.utils.TableField;
 
 /**
@@ -62,9 +63,12 @@ public class ChatMsg {
                 SourceType.fromInt(cursor.getInt(cursor.getColumnIndex(TableField.ChatHisTable.sourceType)))
         );
     }
-    private static GregorianCalendar millis2Calendar(long millis){
-        GregorianCalendar calendar=new GregorianCalendar();
-        calendar.setTimeInMillis(millis);
-        return calendar;
+    public MsgEvent toMsgEvent(){
+        return new MsgEvent(
+                time,
+                type.getInt(),
+                value,
+                sourceType.getInt()
+        );
     }
 }

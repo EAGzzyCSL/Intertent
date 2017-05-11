@@ -28,13 +28,17 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.ArrayList;
+
 import me.eagzzycsl.intertent.MainActivity;
 import me.eagzzycsl.intertent.R;
 import me.eagzzycsl.intertent.event.CallEvent;
 import me.eagzzycsl.intertent.event.ClipboardEvent;
 import me.eagzzycsl.intertent.event.MsgEvent;
 import me.eagzzycsl.intertent.manager.ServerManager;
+import me.eagzzycsl.intertent.model.ChatMsg;
 import me.eagzzycsl.intertent.utils.MyLog;
+import me.eagzzycsl.intertent.utils.SQLMan;
 
 /**
  * Created by eagzzycsl on 4/16/17.
@@ -67,7 +71,15 @@ public class MainService extends Service {
     }
 
     private void initServer() {
-        ServerManager.getInstance().initWebSocket();
+        ServerManager.getInstance().initWebSocket(new ServerManager.OnConnectedCallBack(){
+            @Override
+            public void callBack() {
+                Log.i("in connected callback","callback");
+                ArrayList<ChatMsg> msgList = SQLMan.getInstance(getApplicationContext()).getAllChatHis();
+                ServerManager.getInstance().sendAllChatHis(msgList);
+            }
+        });
+
     }
 
     @Override

@@ -9,7 +9,7 @@ import me.eagzzycsl.intertent.utils.SingleManager;
 public class EventPackForJs {
     private static  EventPackForJs instance=new EventPackForJs();
     private String type;
-    private MyEvent event;
+    private Object event;
     private EventPackForJs(){
 
     }
@@ -20,7 +20,8 @@ public class EventPackForJs {
         this.type=eventList.name;
         return this;
     }
-    public EventPackForJs setEvent(MyEvent myEvent){
+    // change to setData?
+    public EventPackForJs setEvent(Object myEvent){
         this.event=myEvent;
         return this;
     }

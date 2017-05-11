@@ -8,17 +8,23 @@ import me.eagzzycsl.intertent.model.SourceType;
  * Created by eagzzycsl on 5/9/17.
  */
 
-public class MsgEvent {
+public class MsgEvent extends MyEvent {
     private long time;
-    private MsgType type;
+    private int type;
     private String value;
-    private SourceType sourceType;
+    private int sourceType;
+    public MsgEvent(long time,int type,String value,int sourceType){
+        this.time=time;
+        this.type=type;
+        this.value=value;
+        this.sourceType=sourceType;
+    }
     public ChatMsg toChatMsg(){
         return new ChatMsg(
                 time,
-                type,
+                MsgType.fromInt(type),
                 value,
-                sourceType
+                SourceType.fromInt(sourceType)
         );
     }
 }

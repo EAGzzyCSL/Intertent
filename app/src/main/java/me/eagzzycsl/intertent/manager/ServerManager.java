@@ -1,12 +1,16 @@
 package me.eagzzycsl.intertent.manager;
 
 
+import android.util.Log;
+
 import com.koushikdutta.async.callback.CompletedCallback;
 import com.koushikdutta.async.http.WebSocket;
 import com.koushikdutta.async.http.server.AsyncHttpServer;
 import com.koushikdutta.async.http.server.AsyncHttpServerRequest;
 
 import org.greenrobot.eventbus.EventBus;
+
+import java.util.ArrayList;
 
 import me.eagzzycsl.intertent.event.CallEvent;
 import me.eagzzycsl.intertent.event.ClipboardEvent;
@@ -15,7 +19,9 @@ import me.eagzzycsl.intertent.event.EventPackForJs;
 import me.eagzzycsl.intertent.event.InputEvent;
 import me.eagzzycsl.intertent.event.MouseEvent;
 import me.eagzzycsl.intertent.event.MsgEvent;
+import me.eagzzycsl.intertent.model.ChatMsg;
 import me.eagzzycsl.intertent.utils.MyLog;
+import me.eagzzycsl.intertent.utils.SQLMan;
 import me.eagzzycsl.intertent.utils.SingleManager;
 
 /**
@@ -28,10 +34,10 @@ public class ServerManager {
     private static boolean listened = false;
     private WebSocket webSocket;
     private AsyncHttpServer serverInstance = new AsyncHttpServer();
-    private WebSocket.StringCallback webSocketStringCallback= new WebSocket.StringCallback() {
+    private WebSocket.StringCallback webSocketStringCallback = new WebSocket.StringCallback() {
         @Override
         public void onStringAvailable(String s) {
-//            MyLog.i("serverManager", s);
+            MyLog.i("serverManager", s);
             String[] ss = s.split("\\|", 2);
             String json = ss[1];
             switch (ss[0]) {
@@ -53,16 +59,17 @@ public class ServerManager {
                     EventBus.getDefault().post(clipBoardEvent);
                     break;
                 }
-                case EventList.event_mouse:{
-                    MouseEvent mouseEvent=(MouseEvent)SingleManager
-                            .getGson().fromJson(json,EventList.mouse.cls);
+                case EventList.event_mouse: {
+                    MouseEvent mouseEvent = (MouseEvent) SingleManager
+                            .getGson().fromJson(json, EventList.mouse.cls);
                     EventBus.getDefault().post(mouseEvent);
                     break;
                 }
-                case EventList.event_msg:{
-                    MsgEvent msgEvent=(MsgEvent)SingleManager.getGson()
-                            .fromJson(json,EventList.msg.cls);
+                case EventList.event_msg: {
+                    MsgEvent msgEvent = (MsgEvent) SingleManager.getGson()
+                            .fromJson(json, EventList.msg.cls);
                     EventBus.getDefault().post(msgEvent);
+                    Log.i("MSG", json);
                     break;
                 }
             }
@@ -84,7 +91,7 @@ public class ServerManager {
         return serverInstance;
     }
 
-    public void initWebSocket() {
+    public void initWebSocket(final OnConnectedCallBack onConnectedCallBack) {
         this.getServer().websocket("/ws",
                 new AsyncHttpServer.WebSocketRequestCallback() {
                     @Override
@@ -104,15 +111,19 @@ public class ServerManager {
 
                         webSocket.setStringCallback(webSocketStringCallback);
 
+                        onConnectedCallBack.callBack();
+
                     }
 
                 });
     }
-    public void disConnectWebSocket(){
-        if(this.webSocket!=null){
+
+    public void disConnectWebSocket() {
+        if (this.webSocket != null) {
             webSocket.close();
         }
     }
+
     public void sendClipboardEvent(ClipboardEvent clipboardEvent) {
         this.webSocket.send(
                 EventPackForJs.getInstance()
@@ -120,5 +131,28 @@ public class ServerManager {
                         .setEvent(clipboardEvent)
                         .pack()
         );
+    }
+
+    public void sendMsgEvent(MsgEvent msgEvent) {
+        this.webSocket.send(
+                EventPackForJs.getInstance()
+                        .setType(EventList.msg)
+                        .setEvent(msgEvent)
+                        .pack()
+        );
+    }
+
+    public void sendAllChatHis(ArrayList<ChatMsg> chatMsgList) {
+        Log.i("snedAllHis", chatMsgList.size() + "");
+        this.webSocket.send(
+                EventPackForJs.getInstance()
+                        .setType(EventList.allMsgHis)
+                        .setEvent(chatMsgList)
+                        .pack()
+        );
+    }
+
+    public abstract static class OnConnectedCallBack {
+        public abstract void callBack();
     }
 }

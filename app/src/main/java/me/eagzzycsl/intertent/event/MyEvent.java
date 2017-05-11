@@ -5,4 +5,5 @@ package me.eagzzycsl.intertent.event;
  */
 
 public abstract  class MyEvent {
+
 }

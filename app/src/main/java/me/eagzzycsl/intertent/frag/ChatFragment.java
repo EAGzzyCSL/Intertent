@@ -10,12 +10,14 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
+import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
@@ -26,7 +28,9 @@ import java.util.GregorianCalendar;
 
 import me.eagzzycsl.intertent.R;
 import me.eagzzycsl.intertent.adapter.ChatRecAdapter;
+import me.eagzzycsl.intertent.event.EventList;
 import me.eagzzycsl.intertent.event.MsgEvent;
+import me.eagzzycsl.intertent.manager.ServerManager;
 import me.eagzzycsl.intertent.model.ChatMsg;
 import me.eagzzycsl.intertent.model.MsgType;
 import me.eagzzycsl.intertent.model.SourceType;
@@ -48,6 +52,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
     }
 
     @Nullable
@@ -74,22 +79,6 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
     }
     private void myCreate(){
         chatRecAdapter =new ChatRecAdapter();
-//        SQLMan.getInstance(getActivity().getApplicationContext()).addChatHis(
-//                new ChatMsg(
-//                        (new GregorianCalendar(2017,4,21,15,40,30)).getTimeInMillis(),
-//                        MsgType.text,
-//                        "hi hi hi ",
-//                        SourceType.pc
-//                )
-//        );
-//        SQLMan.getInstance(getActivity().getApplicationContext()).addChatHis(
-//                new ChatMsg(
-//                        (new GregorianCalendar(2017,4,21,15,20,30)).getTimeInMillis(),
-//                        MsgType.text,
-//                        "hello world",
-//                        SourceType.android
-//                )
-//        );
         chatMsgList=SQLMan.getInstance(getActivity().getApplicationContext()).getAllChatHis();
         chatRecAdapter.setData(chatMsgList);
         rec_chat_list.scrollToPosition(chatMsgList.size());
@@ -138,9 +127,9 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
                         chat_input_edit.getText().toString(),
                         SourceType.android
                 );
+                ServerManager.getInstance().sendMsgEvent(chatMsg.toMsgEvent());
                 this.addMsgToDbAndUI(chatMsg);
                 chat_input_edit.setText("");
-
             }
         }
     }
@@ -157,6 +146,13 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
     }
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(MsgEvent msgEvent){
+        Log.i("msgEvent",msgEvent.toChatMsg().getValue());
         this.addMsgToDbAndUI(msgEvent.toChatMsg());
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
     }
 }
