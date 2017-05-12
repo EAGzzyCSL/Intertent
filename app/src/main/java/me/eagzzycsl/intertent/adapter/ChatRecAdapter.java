@@ -14,8 +14,6 @@ import java.util.ArrayList;
 
 import me.eagzzycsl.intertent.R;
 import me.eagzzycsl.intertent.model.ChatMsg;
-import me.eagzzycsl.intertent.model.MsgType;
-import me.eagzzycsl.intertent.model.SourceType;
 
 
 public class ChatRecAdapter extends Adapter<ChatRecAdapter.ChatRecViewHolder> {
@@ -36,7 +34,7 @@ public class ChatRecAdapter extends Adapter<ChatRecAdapter.ChatRecViewHolder> {
         public void updateUI(ChatMsg chatMsg) {
 
             ((LinearLayout) itemView).setGravity(
-                    chatMsg.getSourceType()== SourceType.android?Gravity.END:Gravity.START
+                    chatMsg.getSourceType()== ChatMsg.SourceType.type_android?Gravity.END:Gravity.START
             );
         }
     }
@@ -99,19 +97,19 @@ public class ChatRecAdapter extends Adapter<ChatRecAdapter.ChatRecViewHolder> {
     @Override
     public ChatRecViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         switch (viewType) {
-            case MsgType.type_text: {
+            case ChatMsg.MsgType.type_text: {
                 return new ChatTextViewHolder(
                         LayoutInflater.from(parent.getContext()).inflate(
                                 R.layout.chat_msg_text, parent, false
                         ));
             }
-            case MsgType.type_img: {
+            case ChatMsg.MsgType.type_img: {
                 return new ChatTextViewHolder(
                         LayoutInflater.from(parent.getContext()).inflate(
                                 R.layout.chat_msg_img, parent, false
                         ));
             }
-            case MsgType.type_file: {
+            case ChatMsg.MsgType.type_file: {
                 return new ChatTextViewHolder(
                         LayoutInflater.from(parent.getContext()).inflate(
                                 R.layout.chat_msg_file, parent, false
@@ -133,6 +131,6 @@ public class ChatRecAdapter extends Adapter<ChatRecAdapter.ChatRecViewHolder> {
 
     @Override
     public int getItemViewType(int position) {
-        return chatHis.get(position).getTypeInt();
+        return chatHis.get(position).getMsgType();
     }
 }

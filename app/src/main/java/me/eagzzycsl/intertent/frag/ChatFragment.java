@@ -1,11 +1,9 @@
 package me.eagzzycsl.intertent.frag;
 
 
-import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -22,18 +20,12 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.GregorianCalendar;
 
 import me.eagzzycsl.intertent.R;
 import me.eagzzycsl.intertent.adapter.ChatRecAdapter;
-import me.eagzzycsl.intertent.event.EventList;
 import me.eagzzycsl.intertent.event.MsgEvent;
 import me.eagzzycsl.intertent.manager.ServerManager;
 import me.eagzzycsl.intertent.model.ChatMsg;
-import me.eagzzycsl.intertent.model.MsgType;
-import me.eagzzycsl.intertent.model.SourceType;
 import me.eagzzycsl.intertent.utils.SQLMan;
 
 /**
@@ -123,9 +115,9 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
             case R.id.chat_input_send:{
                 ChatMsg chatMsg =new ChatMsg(
                         System.currentTimeMillis(),
-                        MsgType.text,
+                        ChatMsg.MsgType.type_text,
                         chat_input_edit.getText().toString(),
-                        SourceType.android
+                        ChatMsg.SourceType.type_android
                 );
                 ServerManager.getInstance().sendMsgEvent(chatMsg.toMsgEvent());
                 this.addMsgToDbAndUI(chatMsg);

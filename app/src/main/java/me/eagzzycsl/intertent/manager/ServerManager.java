@@ -143,7 +143,6 @@ public class ServerManager {
     }
 
     public void sendAllChatHis(ArrayList<ChatMsg> chatMsgList) {
-        Log.i("snedAllHis", chatMsgList.size() + "");
         this.webSocket.send(
                 EventPackForJs.getInstance()
                         .setType(EventList.allMsgHis)

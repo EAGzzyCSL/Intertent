@@ -1,10 +1,5 @@
 package me.eagzzycsl.intertent.utils;
 
-import java.util.GregorianCalendar;
-
-import me.eagzzycsl.intertent.model.MsgType;
-import me.eagzzycsl.intertent.model.SourceType;
-
 /**
  * Created by eagzzycsl on 5/7/17.
  */
