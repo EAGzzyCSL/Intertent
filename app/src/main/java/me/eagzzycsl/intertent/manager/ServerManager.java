@@ -3,14 +3,21 @@ package me.eagzzycsl.intertent.manager;
 
 import android.util.Log;
 
+import com.koushikdutta.async.ByteBufferList;
+import com.koushikdutta.async.DataEmitter;
 import com.koushikdutta.async.callback.CompletedCallback;
+import com.koushikdutta.async.callback.DataCallback;
 import com.koushikdutta.async.http.WebSocket;
 import com.koushikdutta.async.http.server.AsyncHttpServer;
 import com.koushikdutta.async.http.server.AsyncHttpServerRequest;
+import com.koushikdutta.async.http.server.AsyncHttpServerResponse;
+import com.koushikdutta.async.http.server.HttpServerRequestCallback;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import me.eagzzycsl.intertent.event.CallEvent;
 import me.eagzzycsl.intertent.event.ClipboardEvent;
@@ -77,6 +84,7 @@ public class ServerManager {
     };
 
     private ServerManager() {
+
     }
 
     public static ServerManager getInstance() {
@@ -87,6 +95,30 @@ public class ServerManager {
         if (!listened) {
             serverInstance.listen(1995);
             listened = true;
+            serverInstance.get("/fl", new HttpServerRequestCallback() {
+                @Override
+                public void onRequest(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
+                    String path=request.getQuery().getString("file");
+                    Log.i("request",path);
+                    File f=new File(path);
+                    Log.i("fixed file",f.getPath());
+//                response.send("hello world");
+                    response.sendFile(f);
+                }
+            });
+            serverInstance.get("/ph", new HttpServerRequestCallback() {
+                @Override
+                public void onRequest(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
+                    String path=request.getQuery().getString("path");
+                    Log.i("reqpath",path);
+                    File f=new File(path);
+                    if(f.isDirectory()){
+                        String dirJson = SingleManager.getGson().toJson(f.list());
+                        response.send(dirJson);
+                    }
+                    response.send("[]");
+                }
+            });
         }
         return serverInstance;
     }
@@ -108,16 +140,12 @@ public class ServerManager {
                                 }
                             }
                         });
-
                         webSocket.setStringCallback(webSocketStringCallback);
-
                         onConnectedCallBack.callBack();
-
                     }
 
                 });
     }
-
     public void disConnectWebSocket() {
         if (this.webSocket != null) {
             webSocket.close();

@@ -1,6 +1,10 @@
 package me.eagzzycsl.intertent.frag;
 
 
+import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -14,11 +18,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 import me.eagzzycsl.intertent.R;
@@ -27,6 +33,8 @@ import me.eagzzycsl.intertent.event.MsgEvent;
 import me.eagzzycsl.intertent.manager.ServerManager;
 import me.eagzzycsl.intertent.model.ChatMsg;
 import me.eagzzycsl.intertent.utils.SQLMan;
+
+import static android.app.Activity.RESULT_OK;
 
 /**
  * Created by eagzzycsl on 4/17/17.
@@ -41,6 +49,9 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
     private ImageButton chat_input_send;
     private EditText chat_input_edit;
     private ArrayList<ChatMsg> chatMsgList;
+    private interface Intent_Code{
+         int FILE_SELECT_CODE = 0;
+    }
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,9 +130,27 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
                         chat_input_edit.getText().toString(),
                         ChatMsg.SourceType.type_android
                 );
-                ServerManager.getInstance().sendMsgEvent(chatMsg.toMsgEvent());
-                this.addMsgToDbAndUI(chatMsg);
+                sendMsg(chatMsg);
                 chat_input_edit.setText("");
+                break;
+            }
+            case R.id.chat_input_file:{
+                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                    intent.setType("*/*");
+                    intent.addCategory(Intent.CATEGORY_OPENABLE);
+                    try {
+                        startActivityForResult(
+                                Intent.createChooser(intent, "Select a File to Upload"),
+                                Intent_Code.FILE_SELECT_CODE);
+                    } catch (android.content.ActivityNotFoundException ex) {
+                        // Potentially direct the user to the Market with a Dialog
+                        Toast.makeText(getContext(), "Please install a File Manager.", Toast.LENGTH_SHORT).show();
+                    }
+                break;
+            }
+            case R.id.chat_input_image:{
+
+                break;
             }
         }
     }
@@ -146,5 +175,57 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
     public void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
+    }
+    private void sendMsg(ChatMsg chatMsg){
+        ServerManager.getInstance().sendMsgEvent(chatMsg.toMsgEvent());
+        addMsgToDbAndUI(chatMsg);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode){
+            case Intent_Code.FILE_SELECT_CODE:{
+                if(resultCode==RESULT_OK){
+                    Uri uri = data.getData();
+                    Log.d("filechoose", "File Uri: " + uri.toString());
+                    // Get the path
+                    String path = null;
+                    try {
+                        path = getPath(getContext(), uri);
+                        Log.d("filechoose", "File Path: " + path);
+                        ChatMsg chatMsg =new ChatMsg(
+                                System.currentTimeMillis(),
+                                ChatMsg.MsgType.type_file,
+                                path,
+                                ChatMsg.SourceType.type_android
+                        );
+                        sendMsg(chatMsg);
+                    } catch (URISyntaxException e) {
+                        e.printStackTrace();
+                    }
+                }
+                break;
+            }
+        }
+    }
+    private String getPath(Context context, Uri uri) throws URISyntaxException {
+        if ("content".equalsIgnoreCase(uri.getScheme())) {
+            String[] projection = { "_data" };
+            Cursor cursor = null;
+            try {
+                cursor = context.getContentResolver().query(uri, projection, null, null, null);
+                int column_index = cursor.getColumnIndexOrThrow("_data");
+                if (cursor.moveToFirst()) {
+                    return cursor.getString(column_index);
+                }
+                cursor.close();
+            } catch (Exception e) {
+                // Eat it  Or Log it.
+            }
+        } else if ("file".equalsIgnoreCase(uri.getScheme())) {
+            return uri.getPath();
+        }
+        return null;
     }
 }

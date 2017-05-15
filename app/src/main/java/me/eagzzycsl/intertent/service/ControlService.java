@@ -41,7 +41,6 @@ public class ControlService extends   AccessibilityService {
         EventBus.getDefault().register(this);
 
         dm =getResources().getDisplayMetrics();
-        MyLog.i("dmdmdm",dm.widthPixels+","+dm.heightPixels);
 
         cursorView = View.inflate(getApplicationContext(), R.layout.cursor, null);
         cursorLayout = new WindowManager.LayoutParams(
