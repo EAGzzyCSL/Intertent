@@ -162,6 +162,9 @@ public class ServerManager {
     }
 
     public void sendMsgEvent(MsgEvent msgEvent) {
+        if(this.webSocket==null){
+            return;
+        }
         this.webSocket.send(
                 EventPackForJs.getInstance()
                         .setType(EventList.msg)
@@ -171,6 +174,7 @@ public class ServerManager {
     }
 
     public void sendAllChatHis(ArrayList<ChatMsg> chatMsgList) {
+
         this.webSocket.send(
                 EventPackForJs.getInstance()
                         .setType(EventList.allMsgHis)

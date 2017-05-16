@@ -1,5 +1,6 @@
 package me.eagzzycsl.intertent.adapter;
 
+import android.net.Uri;
 import android.support.annotation.CallSuper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.Adapter;
@@ -10,7 +11,11 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.facebook.drawee.view.SimpleDraweeView;
+
+import java.io.File;
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 
 import me.eagzzycsl.intertent.R;
 import me.eagzzycsl.intertent.model.ChatMsg;
@@ -59,34 +64,38 @@ public class ChatRecAdapter extends Adapter<ChatRecAdapter.ChatRecViewHolder> {
     }
 
     static class ChatImgViewHolder extends ChatRecViewHolder {
-
+        private SimpleDraweeView chat_msg_img;
         public ChatImgViewHolder(View itemView) {
             super(itemView);
         }
 
         @Override
         void findView(View itemView) {
+            this.chat_msg_img=(SimpleDraweeView)itemView.findViewById(R.id.chat_msg_img);
         }
 
         @Override
         public void updateUI(ChatMsg chatMsg) {
             super.updateUI(chatMsg);
+            this.chat_msg_img.setImageURI(Uri.fromFile(new File(chatMsg.getValue())));
         }
     }
 
     static class ChatFileViewHolder extends ChatRecViewHolder {
+        private TextView chat_msg_file_name;
         public ChatFileViewHolder(View itemView) {
             super(itemView);
         }
 
         @Override
         void findView(View itemView) {
-
+            this.chat_msg_file_name=(TextView)itemView.findViewById(R.id.chat_msg_file_name);
         }
 
         @Override
         public void updateUI(ChatMsg chatMsg) {
             super.updateUI(chatMsg);
+            this.chat_msg_file_name.setText(new File(chatMsg.getValue()).getName());
         }
     }
 
@@ -104,13 +113,13 @@ public class ChatRecAdapter extends Adapter<ChatRecAdapter.ChatRecViewHolder> {
                         ));
             }
             case ChatMsg.MsgType.type_img: {
-                return new ChatTextViewHolder(
+                return new ChatImgViewHolder(
                         LayoutInflater.from(parent.getContext()).inflate(
                                 R.layout.chat_msg_img, parent, false
                         ));
             }
             case ChatMsg.MsgType.type_file: {
-                return new ChatTextViewHolder(
+                return new ChatFileViewHolder(
                         LayoutInflater.from(parent.getContext()).inflate(
                                 R.layout.chat_msg_file, parent, false
                         ));

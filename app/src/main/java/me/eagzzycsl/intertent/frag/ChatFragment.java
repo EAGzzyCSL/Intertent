@@ -20,6 +20,8 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
+
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -51,11 +53,13 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
     private ArrayList<ChatMsg> chatMsgList;
     private interface Intent_Code{
          int FILE_SELECT_CODE = 0;
+        int PICK_IMAGE_REQUEST=1;
     }
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EventBus.getDefault().register(this);
+        Fresco.initialize(this.getContext());
     }
 
     @Nullable
@@ -149,7 +153,13 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
                 break;
             }
             case R.id.chat_input_image:{
-
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(
+                        Intent.createChooser(intent, "Select Picture"),
+                        Intent_Code.PICK_IMAGE_REQUEST
+                );
                 break;
             }
         }
@@ -197,6 +207,28 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
                         ChatMsg chatMsg =new ChatMsg(
                                 System.currentTimeMillis(),
                                 ChatMsg.MsgType.type_file,
+                                path,
+                                ChatMsg.SourceType.type_android
+                        );
+                        sendMsg(chatMsg);
+                    } catch (URISyntaxException e) {
+                        e.printStackTrace();
+                    }
+                }
+                break;
+            }
+            case Intent_Code.PICK_IMAGE_REQUEST:{
+                if(resultCode==RESULT_OK){
+                    Uri uri = data.getData();
+                    Log.d("filechoose", "File Uri: " + uri.toString());
+                    // Get the path
+                    String path = null;
+                    try {
+                        path = getPath(getContext(), uri);
+                        Log.d("filechoose", "File Path: " + path);
+                        ChatMsg chatMsg =new ChatMsg(
+                                System.currentTimeMillis(),
+                                ChatMsg.MsgType.type_img,
                                 path,
                                 ChatMsg.SourceType.type_android
                         );
