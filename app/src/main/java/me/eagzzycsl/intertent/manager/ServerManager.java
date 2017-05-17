@@ -1,6 +1,7 @@
 package me.eagzzycsl.intertent.manager;
 
 
+import android.util.EventLog;
 import android.util.Log;
 
 import com.koushikdutta.async.ByteBufferList;
@@ -12,10 +13,12 @@ import com.koushikdutta.async.http.server.AsyncHttpServer;
 import com.koushikdutta.async.http.server.AsyncHttpServerRequest;
 import com.koushikdutta.async.http.server.AsyncHttpServerResponse;
 import com.koushikdutta.async.http.server.HttpServerRequestCallback;
+import com.koushikdutta.async.stream.FileDataSink;
 
 import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -23,6 +26,7 @@ import me.eagzzycsl.intertent.event.CallEvent;
 import me.eagzzycsl.intertent.event.ClipboardEvent;
 import me.eagzzycsl.intertent.event.EventList;
 import me.eagzzycsl.intertent.event.EventPackForJs;
+import me.eagzzycsl.intertent.event.GetFileListEvent;
 import me.eagzzycsl.intertent.event.InputEvent;
 import me.eagzzycsl.intertent.event.MouseEvent;
 import me.eagzzycsl.intertent.event.MsgEvent;
@@ -79,6 +83,22 @@ public class ServerManager {
                     Log.i("MSG", json);
                     break;
                 }
+                case EventList.event_get_file_list:{
+                    Log.i("wsfilepath",json);
+                    GetFileListEvent getFileListEvent =(GetFileListEvent)SingleManager.getGson()
+                            .fromJson(json, EventList.getFileList.cls);
+                    File f=new File(getFileListEvent.path);
+                    Log.i("filefile",f.getPath());
+                    Log.i("filefile2",f.isDirectory()?"dir":"file");
+                    if(f.isDirectory()) {
+                        ArrayList<FileDsc> fileDscList = new ArrayList<>(f.listFiles().length);
+                        for (File file : f.listFiles()) {
+                            fileDscList.add(new FileDsc(file));
+                        }
+                        sendFileList(fileDscList);
+                    }
+                    break;
+                }
             }
         }
     };
@@ -90,7 +110,14 @@ public class ServerManager {
     public static ServerManager getInstance() {
         return serverManager;
     }
-
+    public void sendFileList(ArrayList<FileDsc> fileDscList){
+        this.webSocket.send(
+                EventPackForJs.getInstance()
+                        .setType(EventList.sendFileList)
+                        .setEvent(fileDscList)
+                        .pack()
+        );
+    }
     public AsyncHttpServer getServer() {
         if (!listened) {
             serverInstance.listen(1995);
@@ -106,23 +133,34 @@ public class ServerManager {
                     response.sendFile(f);
                 }
             });
-            serverInstance.get("/ph", new HttpServerRequestCallback() {
-                @Override
-                public void onRequest(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
-                    String path=request.getQuery().getString("path");
-                    Log.i("reqpath",path);
-                    File f=new File(path);
-                    if(f.isDirectory()){
-                        String dirJson = SingleManager.getGson().toJson(f.list());
-                        response.send(dirJson);
-                    }
-                    response.send("[]");
-                }
-            });
+//            serverInstance.get("/ph", new HttpServerRequestCallback() {
+//                @Override
+//                public void onRequest(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
+//                    String path=request.getQuery().getString("path");
+//                    Log.i("reqpath",path);
+//                    File f=new File(path);
+//                    ArrayList<FileDsc> fileDscList =new ArrayList<FileDsc>(f.listFiles().length);
+//                    for (File file : f.listFiles()) {
+//                        fileDscList.add(new FileDsc(file));
+//                    }
+//                    if(f.isDirectory()){
+//                        String dirJson = SingleManager.getGson().toJson(fileDscList);
+//                        response.send(dirJson);
+//                    }
+//                    response.send("[]");
+//                }
+//            });
         }
         return serverInstance;
     }
-
+    private static class FileDsc{
+        String name;
+        boolean dir;
+        public FileDsc(File f){
+            this.name=f.getName();
+            this.dir=f.isDirectory();
+        }
+    }
     public void initWebSocket(final OnConnectedCallBack onConnectedCallBack) {
         this.getServer().websocket("/ws",
                 new AsyncHttpServer.WebSocketRequestCallback() {
