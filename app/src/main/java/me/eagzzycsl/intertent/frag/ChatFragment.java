@@ -34,6 +34,7 @@ import me.eagzzycsl.intertent.adapter.ChatRecAdapter;
 import me.eagzzycsl.intertent.event.MsgEvent;
 import me.eagzzycsl.intertent.manager.ServerManager;
 import me.eagzzycsl.intertent.model.ChatMsg;
+import me.eagzzycsl.intertent.utils.MyLog;
 import me.eagzzycsl.intertent.utils.SQLMan;
 
 import static android.app.Activity.RESULT_OK;
@@ -177,7 +178,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
     }
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(MsgEvent msgEvent){
-        Log.i("msgEvent",msgEvent.toChatMsg().getValue());
+//        Log.i("msgEvent",msgEvent.toChatMsg().getValue());
         this.addMsgToDbAndUI(msgEvent.toChatMsg());
     }
 
@@ -198,12 +199,12 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
             case Intent_Code.FILE_SELECT_CODE:{
                 if(resultCode==RESULT_OK){
                     Uri uri = data.getData();
-                    Log.d("filechoose", "File Uri: " + uri.toString());
+//                    MyLog.i("filechoose", "File Uri: " + uri.toString());
                     // Get the path
                     String path = null;
                     try {
                         path = getPath(getContext(), uri);
-                        Log.d("filechoose", "File Path: " + path);
+//                        MyLog.i("filechoose", "File Path: " + path);
                         ChatMsg chatMsg =new ChatMsg(
                                 System.currentTimeMillis(),
                                 ChatMsg.MsgType.type_file,
@@ -220,12 +221,12 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
             case Intent_Code.PICK_IMAGE_REQUEST:{
                 if(resultCode==RESULT_OK){
                     Uri uri = data.getData();
-                    Log.d("filechoose", "File Uri: " + uri.toString());
+//                    Log.d("filechoose", "File Uri: " + uri.toString());
                     // Get the path
                     String path = null;
                     try {
                         path = getPath(getContext(), uri);
-                        Log.d("filechoose", "File Path: " + path);
+//                        Log.d("filechoose", "File Path: " + path);
                         ChatMsg chatMsg =new ChatMsg(
                                 System.currentTimeMillis(),
                                 ChatMsg.MsgType.type_img,

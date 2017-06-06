@@ -48,7 +48,7 @@ public class ServerManager {
     private WebSocket.StringCallback webSocketStringCallback = new WebSocket.StringCallback() {
         @Override
         public void onStringAvailable(String s) {
-            MyLog.i("serverManager", s);
+//            MyLog.i("serverManager", s);
             String[] ss = s.split("\\|", 2);
             String json = ss[1];
             switch (ss[0]) {
@@ -126,30 +126,10 @@ public class ServerManager {
                 @Override
                 public void onRequest(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
                     String path=request.getQuery().getString("file");
-                    Log.i("request",path);
                     File f=new File(path);
-                    Log.i("fixed file",f.getPath());
-//                response.send("hello world");
                     response.sendFile(f);
                 }
             });
-//            serverInstance.get("/ph", new HttpServerRequestCallback() {
-//                @Override
-//                public void onRequest(AsyncHttpServerRequest request, AsyncHttpServerResponse response) {
-//                    String path=request.getQuery().getString("path");
-//                    Log.i("reqpath",path);
-//                    File f=new File(path);
-//                    ArrayList<FileDsc> fileDscList =new ArrayList<FileDsc>(f.listFiles().length);
-//                    for (File file : f.listFiles()) {
-//                        fileDscList.add(new FileDsc(file));
-//                    }
-//                    if(f.isDirectory()){
-//                        String dirJson = SingleManager.getGson().toJson(fileDscList);
-//                        response.send(dirJson);
-//                    }
-//                    response.send("[]");
-//                }
-//            });
         }
         return serverInstance;
     }
@@ -166,7 +146,6 @@ public class ServerManager {
                 new AsyncHttpServer.WebSocketRequestCallback() {
                     @Override
                     public void onConnected(final WebSocket webSocket, AsyncHttpServerRequest request) {
-                        MyLog.i("websocket", "connnected");
                         ServerManager.this.webSocket = webSocket;
                         webSocket.setClosedCallback(new CompletedCallback() {
                             @Override
@@ -209,6 +188,7 @@ public class ServerManager {
                         .setEvent(msgEvent)
                         .pack()
         );
+
     }
 
     public void sendAllChatHis(ArrayList<ChatMsg> chatMsgList) {

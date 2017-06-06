@@ -29,12 +29,6 @@ import me.eagzzycsl.intertent.event.InputEvent;
 import me.eagzzycsl.intertent.utils.MyLog;
 
 public class MyInputService extends InputMethodService {
-    private TextView textView_info;
-    private String wsLink = null;
-    private String state = null;
-    private boolean currentShowIsWsLink = true;
-    private SettingSP settingSP;
-    private int port;
 
     @Override
     public void onCreate() {
@@ -42,30 +36,11 @@ public class MyInputService extends InputMethodService {
         EventBus.getDefault().register(this);
     }
 
-    private String getIp() {
-        WifiManager wm = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
-        int ipAddress = wm.getConnectionInfo().getIpAddress();
-        if (ByteOrder.nativeOrder().equals(ByteOrder.LITTLE_ENDIAN)) {
-            ipAddress = Integer.reverseBytes(ipAddress);
-        }
-        byte[] ipByteArray = BigInteger.valueOf(ipAddress).toByteArray();
-
-        String ipAddressString;
-        try {
-            ipAddressString = InetAddress.getByAddress(ipByteArray).getHostAddress();
-        } catch (UnknownHostException ex) {
-            ipAddressString = null;
-        }
-        return ipAddressString;
-    }
 
     @Override
     public void onInitializeInterface() {
         super.onInitializeInterface();
         MyLog.i(MyLog.msg_inputService, "初始化");
-        settingSP = new SettingSP(this);
-        state = getString(R.string.waitForConnect);
-        port = settingSP.getDefaultPort();
     }
 
     @Override
@@ -74,37 +49,6 @@ public class MyInputService extends InputMethodService {
         View v = LayoutInflater.from(getApplicationContext()).inflate(
                 R.layout.keyboard, null
         );
-        textView_info = (TextView) v.findViewById(R.id.textView_info);
-        v.findViewById(R.id.imageView_setting).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MyInputService.this, SettingsActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-            }
-        });
-        v.findViewById(R.id.imageView_switch).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                InputMethodManager imeManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                if (imeManager != null) {
-                    imeManager.showInputMethodPicker();
-                }
-            }
-        });
-        wsLink = getIp() + ":" + port;
-        textView_info.setText(wsLink);
-        textView_info.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (currentShowIsWsLink) {
-                    textView_info.setText(state);
-                } else {
-                    textView_info.setText(wsLink);
-                }
-                currentShowIsWsLink = !currentShowIsWsLink;
-            }
-        });
         return v;
     }
 
@@ -121,7 +65,7 @@ public class MyInputService extends InputMethodService {
 
     @Override
     public void onDestroy() {
-        MyLog.i(MyLog.msg_inputService, "销毁");
+//        MyLog.i(MyLog.msg_inputService, "销毁");
 
         super.onDestroy();
         EventBus.getDefault().unregister(this);
@@ -129,7 +73,7 @@ public class MyInputService extends InputMethodService {
 
     @Subscribe
     public void onEvent(InputEvent inputEvent) {
-        MyLog.i("in inputService", inputEvent.value);
+//        MyLog.i("in inputService", inputEvent.value);
         InputConnection inputConnection = getCurrentInputConnection();
         if (inputConnection != null) {
             switch (inputEvent.type){
@@ -141,7 +85,7 @@ public class MyInputService extends InputMethodService {
                     inputConnection.performEditorAction(
                             EditorInfo.IME_ACTION_SEND
                     );
-                    MyLog.i("input","enterevent");
+//                    MyLog.i("input","enterevent");
                     break;
                 }
                 case InputEvent.type_backspace:{

@@ -83,27 +83,14 @@ public class ControlService extends   AccessibilityService {
         }
     }
 
-
-    @Override
-    public void onAccessibilityEvent(AccessibilityEvent event) {
-
-    }
     private void click() {
-//        Log.d("click", String.format("Click [%d, %d]", cursorLayout.x, cursorLayout.y));
         AccessibilityNodeInfo nodeInfo = getRootInActiveWindow();
         if (nodeInfo == null) return;
         AccessibilityNodeInfo nearestNodeToMouse = findSmallestNodeAtPoint(nodeInfo, cursorLayout.x, cursorLayout.y + 50);
         if (nearestNodeToMouse != null) {
-//            logNodeHierachy(nearestNodeToMouse, 0);
             nearestNodeToMouse.performAction(AccessibilityNodeInfo.ACTION_CLICK);
         }
         nodeInfo.recycle();
-    }
-
-
-
-    @Override
-    public void onInterrupt() {
     }
     private static AccessibilityNodeInfo findSmallestNodeAtPoint(AccessibilityNodeInfo sourceNode, int x, int y) {
         Rect bounds = new Rect();
@@ -121,5 +108,12 @@ public class ControlService extends   AccessibilityService {
         }
         ActivityManager.RunningAppProcessInfo a=null;
         return sourceNode;
+    }
+    @Override
+    public void onInterrupt() {
+    }
+    @Override
+    public void onAccessibilityEvent(AccessibilityEvent event) {
+
     }
 }

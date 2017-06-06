@@ -4,6 +4,7 @@ import android.net.Uri;
 import android.support.annotation.CallSuper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.Adapter;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -95,6 +96,7 @@ public class ChatRecAdapter extends Adapter<ChatRecAdapter.ChatRecViewHolder> {
         @Override
         public void updateUI(ChatMsg chatMsg) {
             super.updateUI(chatMsg);
+//            Log.i("file",chatMsg.getValue());
             this.chat_msg_file_name.setText(new File(chatMsg.getValue()).getName());
         }
     }

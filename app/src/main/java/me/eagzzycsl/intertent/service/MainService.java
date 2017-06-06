@@ -67,14 +67,14 @@ public class MainService extends Service {
         Notification notification = builder.build();
         ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).notify(0, notification);
         startForeground(1, notification);
-        MyLog.i("服务", "onCreate() executed");
+//        MyLog.i("服务", "onCreate() executed");
     }
 
     private void initServer() {
         ServerManager.getInstance().initWebSocket(new ServerManager.OnConnectedCallBack(){
             @Override
             public void callBack() {
-                Log.i("in connected callback","callback");
+//                Log.i("in connected callback","callback");
                 ArrayList<ChatMsg> msgList = SQLMan.getInstance(getApplicationContext()).getAllChatHis();
                 ServerManager.getInstance().sendAllChatHis(msgList);
             }
