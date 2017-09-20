@@ -65,7 +65,6 @@ public class MyInputService extends InputMethodService {
 
     @Override
     public void onDestroy() {
-//        MyLog.i(MyLog.msg_inputService, "销毁");
 
         super.onDestroy();
         EventBus.getDefault().unregister(this);
@@ -73,7 +72,6 @@ public class MyInputService extends InputMethodService {
 
     @Subscribe
     public void onEvent(InputEvent inputEvent) {
-//        MyLog.i("in inputService", inputEvent.value);
         InputConnection inputConnection = getCurrentInputConnection();
         if (inputConnection != null) {
             switch (inputEvent.type){
@@ -85,7 +83,6 @@ public class MyInputService extends InputMethodService {
                     inputConnection.performEditorAction(
                             EditorInfo.IME_ACTION_SEND
                     );
-//                    MyLog.i("input","enterevent");
                     break;
                 }
                 case InputEvent.type_backspace:{

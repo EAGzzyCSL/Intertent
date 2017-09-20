@@ -73,7 +73,6 @@ public class MainActivity extends AppCompatActivity
         this.main_tabLayout = (TabLayout) findViewById(R.id.main_tabLayout);
         this.main_viewPager = (ViewPager) findViewById(R.id.main_viewPager);
         this.main_toolbar = (Toolbar) findViewById(R.id.main_toolbar);
-//        this.main_fab = (FloatingActionButton) findViewById(R.id.main_fab);
         this.main_navigationView = (NavigationView) findViewById(R.id.main_nav_view);
         this.main_drawer = (DrawerLayout) findViewById(R.id.main_drawer_layout);
     }
@@ -102,7 +101,6 @@ public class MainActivity extends AppCompatActivity
 
     private void mySet() {
         setSupportActionBar(main_toolbar);
-//        main_fab.setOnClickListener(this);
         main_toggle.syncState();
         main_drawer.addDrawerListener(main_toggle);
         main_navigationView.setNavigationItemSelectedListener(this);
@@ -161,10 +159,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-//            case R.id.main_fab: {
-//                Snackbar.make(null, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
         }
     }
 }

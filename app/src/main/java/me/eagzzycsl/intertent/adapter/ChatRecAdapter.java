@@ -96,7 +96,6 @@ public class ChatRecAdapter extends Adapter<ChatRecAdapter.ChatRecViewHolder> {
         @Override
         public void updateUI(ChatMsg chatMsg) {
             super.updateUI(chatMsg);
-//            Log.i("file",chatMsg.getValue());
             this.chat_msg_file_name.setText(new File(chatMsg.getValue()).getName());
         }
     }

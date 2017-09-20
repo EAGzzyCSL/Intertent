@@ -199,12 +199,9 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
             case Intent_Code.FILE_SELECT_CODE:{
                 if(resultCode==RESULT_OK){
                     Uri uri = data.getData();
-//                    MyLog.i("filechoose", "File Uri: " + uri.toString());
-                    // Get the path
                     String path = null;
                     try {
                         path = getPath(getContext(), uri);
-//                        MyLog.i("filechoose", "File Path: " + path);
                         ChatMsg chatMsg =new ChatMsg(
                                 System.currentTimeMillis(),
                                 ChatMsg.MsgType.type_file,
@@ -221,12 +218,9 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
             case Intent_Code.PICK_IMAGE_REQUEST:{
                 if(resultCode==RESULT_OK){
                     Uri uri = data.getData();
-//                    Log.d("filechoose", "File Uri: " + uri.toString());
-                    // Get the path
                     String path = null;
                     try {
                         path = getPath(getContext(), uri);
-//                        Log.d("filechoose", "File Path: " + path);
                         ChatMsg chatMsg =new ChatMsg(
                                 System.currentTimeMillis(),
                                 ChatMsg.MsgType.type_img,

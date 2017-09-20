@@ -48,7 +48,6 @@ public class ServerManager {
     private WebSocket.StringCallback webSocketStringCallback = new WebSocket.StringCallback() {
         @Override
         public void onStringAvailable(String s) {
-//            MyLog.i("serverManager", s);
             String[] ss = s.split("\\|", 2);
             String json = ss[1];
             switch (ss[0]) {
@@ -80,16 +79,12 @@ public class ServerManager {
                     MsgEvent msgEvent = (MsgEvent) SingleManager.getGson()
                             .fromJson(json, EventList.msg.cls);
                     EventBus.getDefault().post(msgEvent);
-                    Log.i("MSG", json);
                     break;
                 }
                 case EventList.event_get_file_list:{
-                    Log.i("wsfilepath",json);
                     GetFileListEvent getFileListEvent =(GetFileListEvent)SingleManager.getGson()
                             .fromJson(json, EventList.getFileList.cls);
                     File f=new File(getFileListEvent.path);
-                    Log.i("filefile",f.getPath());
-                    Log.i("filefile2",f.isDirectory()?"dir":"file");
                     if(f.isDirectory()) {
                         ArrayList<FileDsc> fileDscList = new ArrayList<>(f.listFiles().length);
                         for (File file : f.listFiles()) {

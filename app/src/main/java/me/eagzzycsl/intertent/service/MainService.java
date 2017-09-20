@@ -53,7 +53,6 @@ public class MainService extends Service {
     private void iniNotification() {
 
         Notification.Builder builder = new Notification.Builder(this);
-//        builder.setContentInfo("补充内容");
         builder.setContentText("主内容区");
         builder.setContentTitle("通知标题");
         builder.setTicker("新消息");
@@ -67,14 +66,12 @@ public class MainService extends Service {
         Notification notification = builder.build();
         ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).notify(0, notification);
         startForeground(1, notification);
-//        MyLog.i("服务", "onCreate() executed");
     }
 
     private void initServer() {
         ServerManager.getInstance().initWebSocket(new ServerManager.OnConnectedCallBack(){
             @Override
             public void callBack() {
-//                Log.i("in connected callback","callback");
                 ArrayList<ChatMsg> msgList = SQLMan.getInstance(getApplicationContext()).getAllChatHis();
                 ServerManager.getInstance().sendAllChatHis(msgList);
             }
@@ -86,7 +83,6 @@ public class MainService extends Service {
     public void onCreate() {
         super.onCreate();
         EventBus.getDefault().register(this);
-//        iniNotification();
         initServer();
     }
 

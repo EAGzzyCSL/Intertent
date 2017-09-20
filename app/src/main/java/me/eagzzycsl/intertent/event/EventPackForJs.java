@@ -20,7 +20,6 @@ public class EventPackForJs {
         this.type=eventList.name;
         return this;
     }
-    // change to setData?
     public EventPackForJs setEvent(Object myEvent){
         this.event=myEvent;
         return this;
